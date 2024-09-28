@@ -44,7 +44,15 @@ int main(void) {
 	int sizes[10] = {100, 200, 300, 1000, 2000, 10000, 50000, 100000, 600000, 700000};  
 	int* vector; 
 	double begin, end; 
+	double selection_duration, sorting_duration;  
 	int error = 0; 
+
+	// creating and writing the file into a csv 
+	FILE *fptr;
+	fptr = fopen("results/timeconsumption.csv", "w"); 
+	fprintf(fptr, "VectorSize,TimeForSelection,TimeForSorting\n"); 
+
+
 	for(int i = 0; i < 10; i++) {
 		
 		vector = rvector(sizes[i], 0, 1000000); 
@@ -56,26 +64,32 @@ int main(void) {
 		int selection_output = kth_smallest_selection(vector, sizes[i], sizes[i] / 2); 
 		end = clock(); 
 
-		printf("The time elapsed for selection : %lf s\n",(double) (end - begin) / CLOCKS_PER_SEC ); 
-
+		selection_duration = (double) ((end - begin) / CLOCKS_PER_SEC);  
+		printf("The time elapsed for selection : %lf s\n", selection_duration); 
 
 		begin = clock(); 
 		int sorting_output = kth_smallest_sorting(vector, sizes[i], sizes[i]/2); 
 		end = clock(); 
 
-		printf("The time elapsed for sorting : %lf s\n", (double) (end - begin) / CLOCKS_PER_SEC); 
+
+		sorting_duration = (double) ((end - begin) / CLOCKS_PER_SEC);  
+
+		printf("The time elapsed for sorting : %lf s\n", sorting_duration); 
 		
 		if(sorting_output != selection_output) {
 			error = 1; 
 			printf("ERROR: The sorting output %d is not equal to the selection output %d\n", sorting_output, selection_output);  
 		}
 		printf("=====================================================================\n");
+		fprintf(fptr, "%d,%lf,%lf\n", sizes[i], selection_duration, sorting_duration); 
 	}
+
+	vector = NULL; 
 
 	if(error == 0) {
 		printf("The test succeeded!\n"); 
 	} 
-		
 
-	
+	fclose(fptr); 
+		
 } 
